@@ -14,12 +14,12 @@ struct twoSubData_A
 struct Stump
 {
     double minErr;
-    int bestIndex;//±íÊ¾×îºÃµÄ·ÖÀàÊôĞÔ£¬µ±·ÇÒ¶×Ó½ÚµãÊ±£¬¼´±íÊ¾·ÖÁÑÊôĞÔÏÂ±ê£¬·ñÔòÎª-1£¬±íÊ¾ÎªÒ¶×Ó½Úµã±ê¼Ç
-    string ltOrgt;//´óÓÚãĞÖµµÄÀà±ğÎª-1£¬»¹ÊÇĞ¡ÓÚãĞÖµµÄÀà±ğÎª-1
+    int bestIndex;//è¡¨ç¤ºæœ€å¥½çš„åˆ†ç±»å±æ€§ï¼Œå½“éå¶å­èŠ‚ç‚¹æ—¶ï¼Œå³è¡¨ç¤ºåˆ†è£‚å±æ€§ä¸‹æ ‡ï¼Œå¦åˆ™ä¸º-1ï¼Œè¡¨ç¤ºä¸ºå¶å­èŠ‚ç‚¹æ ‡è®°
+    string ltOrgt;//å¤§äºé˜ˆå€¼çš„ç±»åˆ«ä¸º-1ï¼Œè¿˜æ˜¯å°äºé˜ˆå€¼çš„ç±»åˆ«ä¸º-1
     double threshVal;
     vector<int> label;
-    double alpha;//»ùÑ§Ï°Æ÷Í¶Æ±È¨ÖØ
-    twoSubData_A twosubdata;//Ê÷×®°üÀ¨Á½¸ö·ÖÖ§µÄÊı¾İ
+    double alpha;//åŸºå­¦ä¹ å™¨æŠ•ç¥¨æƒé‡
+    twoSubData_A twosubdata;//æ ‘æ¡©åŒ…æ‹¬ä¸¤ä¸ªåˆ†æ”¯çš„æ•°æ®
 };
 
 vector<Stump> stump;
@@ -73,16 +73,16 @@ Stump buildStump(const Data &data,vector<double> weight)
     int label_index=data[0].size()-1;
     vector<int> label;
     string threshIneq[2]= {"lt","gt"};
-    for(i=0; i<data[0].size()-1; i++) //ÊôĞÔ
+    for(i=0; i<data[0].size()-1; i++) //å±æ€§
     {
         range=rangeSize(data,i);
         rangemin=range[0];
         rangemax=range[1];
         stepSize=(rangemax-rangemin)/numSteps;
-        for(j=0; j<=numSteps; j++) //ÆäÊµÊÇnumstep+1²½
+        for(j=0; j<=numSteps; j++) //å…¶å®æ˜¯numstep+1æ­¥
         {
             threshVal=rangemin+stepSize*j;
-            for(k=0; k<2; k++) //´óÓÚĞ¡ÓÚ
+            for(k=0; k<2; k++) //å¤§äºå°äº
             {
                 label=Classify(data,i,threshVal,threshIneq[k]);
                 weightError=0;
@@ -130,7 +130,7 @@ int adaBoostTrainDS(const Data &data,const int &numIt)
     }
     for(i=0; i<numIt; i++)
     {
-        stump[i] = buildStump(data,weight);//Ğ´³É¸³ÖµÓï¾ä½á¹¹ÌåÖĞµÄ½á¹¹Ìå¸´ÖÆ³öÏÖÎÊÌâ
+        stump[i] = buildStump(data,weight);//å†™æˆèµ‹å€¼è¯­å¥ç»“æ„ä½“ä¸­çš„ç»“æ„ä½“å¤åˆ¶å‡ºç°é—®é¢˜
         cout<<"alpha===="<<stump[i].alpha<<endl;
         weightSum=0;
         for(j=0; j<data.size(); j++)
@@ -156,7 +156,7 @@ int adaBoostTrainDS(const Data &data,const int &numIt)
         sumErr=0;
         for(j=0; j<data.size(); j++)
         {
-            sumErr+=(aggErr[j]-data[0][label_index])>0?(aggErr[j]-data[0][label_index])/2:-(aggErr[j]-data[0][label_index])/2;
+            sumErr+=(aggErr[j]-data[j][label_index])>0?(aggErr[j]-data[j][label_index])/2:-(aggErr[j]-data[j][label_index])/2;
         }
         if(sumErr/data.size()<0.01)
         {
@@ -164,7 +164,7 @@ int adaBoostTrainDS(const Data &data,const int &numIt)
             break;
         }
     }
-    for(i=0; i<numIt; i++) //50ÎªÍ¶Æ±Æ÷¸öÊı£¬µ«²»Ò»¶¨ÊÇ50£¬Ö»»áĞ¡ÓÚµÈÓÚ50
+    for(i=0; i<numIt; i++) //50ä¸ºæŠ•ç¥¨å™¨ä¸ªæ•°ï¼Œä½†ä¸ä¸€å®šæ˜¯50ï¼Œåªä¼šå°äºç­‰äº50
     {
         cout<<stump[i].alpha<<"   "<<stump[i].bestIndex<<"   "<<stump[i].threshVal<<"   "<<stump[i].ltOrgt<<"   "<<stump[i].minErr<<endl;
     }
